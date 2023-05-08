@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinter import *
@@ -92,23 +91,23 @@ def get_input_files(proj_dir, replace_dir): #returns a list of objects that cont
 
 
 def process_files(replace_list): # process all the files in a list of objects, make sure to rename the old file before replaing it 
-    print(len(replace_list))
-    
-    for i in replace_list:
-        ##
-        # do somthing here to rename old file 
-        #print(i.proj_file)
+    if len(replace_list) > 0:
+        for i in replace_list:
+            ##
+            # do somthing here to rename old file 
+            #print(i.proj_file)
+            status_text.delete(1.0, tk.END)
+            status_text.insert(tk.END, "pcocessing " +  i.proj_file)
+            status_text.update_idletasks()
+            run_ffmpeg(i.replace_file, i.proj_file, i.sample_rate, i.bit_depth, i.channel_count)
+            status_text.delete(1.0, tk.END)
+            status_text.insert(tk.END, "compleated " +  i.proj_file)
+            status_text.update_idletasks()
+            #log here
         status_text.delete(1.0, tk.END)
-        status_text.insert(tk.END, "pcocessing " +  i.proj_file)
-        status_text.update_idletasks()
-        run_ffmpeg(i.replace_file, i.proj_file, i.sample_rate, i.bit_depth, i.channel_count)
-        status_text.delete(1.0, tk.END)
-        status_text.insert(tk.END, "compleated " +  i.proj_file)
-        status_text.update_idletasks()
-        #log here
-    status_text.delete(1.0, tk.END)
-    status_text.insert(tk.END, "processed " +  str(len(replace_list)) + " items")
-    
+        status_text.insert(tk.END, "processed " +  str(len(replace_list)) + " items")
+    else:
+        tk.messagebox.showerror(title="Error", message="Please Select Files to Process")    
 
 def make_dpi_aware(): ##this needs to be somewhere to make it look nice
     if int(platform.release()) >= 8:
@@ -129,12 +128,15 @@ def select_replace_dir():
 
 def populate_checkboxes():
     global input_files
-    input_files = get_input_files(proj_dir, replace_dir)
+    #check that a directory has been selected
+    if proj_dir != '' and replace_dir != '':
+        input_files = get_input_files(proj_dir, replace_dir)
 
-    for file in input_files:
-        checkbox = Checkbutton(scrollable_frame.interior, text=file.proj_file, variable=file.selected, bg="white")
-        checkbox.pack(anchor='w')
-
+        for file in input_files:
+            checkbox = Checkbutton(scrollable_frame.interior, text=file.proj_file, variable=file.selected, bg="white")
+            checkbox.pack(anchor='w')
+    else:
+        tk.messagebox.showerror(title="Error", message="Please choose a project and replace Direcoty")
 def select_all():
     for checkbox in scrollable_frame.interior.winfo_children():
         checkbox.select()
@@ -143,6 +145,12 @@ def replace_files():
     replace_list = [file for file in input_files if file.selected.get()]
     process_files(replace_list)
 
+
+
+#decalre golbals
+proj_dir = ""
+replace_dir = ""
+input_files = []
 
 
 root = Tk()
@@ -158,11 +166,6 @@ root.rowconfigure(1, weight=1)
 root.rowconfigure(2, weight=6)
 root.rowconfigure(3, weight=1)
 root.rowconfigure(4, weight=2)
-
-#decalre golbals
-proj_dir = ""
-replace_dir = ""
-input_files = []
 
 proj_dir_button = Button(root, text="Select Project Directory", command=select_proj_dir)
 proj_dir_button.grid(column=2, row=0, sticky=tk.E+tk.W, padx=5, pady=5)
