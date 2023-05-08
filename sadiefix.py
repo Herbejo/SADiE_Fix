@@ -11,13 +11,13 @@ import os
 
 
 
-class ScrollableLabelFrame(ttk.Frame):
+class ScrollableLabelFrame(tk.Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.canvas = tk.Canvas(self)
-        scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
-        self.interior = ttk.Frame(self.canvas)
+        self.canvas = tk.Canvas(self, bg="white")
+        scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.interior = tk.Frame(self.canvas, bg="white")
         self.interior.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
 
         self.canvas.create_window((0, 0), window=self.interior, anchor="nw")
@@ -132,7 +132,7 @@ def populate_checkboxes():
     input_files = get_input_files(proj_dir, replace_dir)
 
     for file in input_files:
-        checkbox = Checkbutton(scrollable_frame.interior, text=file.proj_file, variable=file.selected)
+        checkbox = Checkbutton(scrollable_frame.interior, text=file.proj_file, variable=file.selected, bg="white")
         checkbox.pack(anchor='w')
 
 def select_all():
@@ -146,37 +146,56 @@ def replace_files():
 
 
 root = Tk()
+root.title("SADiE Fix")
 
+#setup window
+root.columnconfigure(0, weight=3)
+root.columnconfigure(1, weight=4)
+root.columnconfigure(2, weight=1)
+
+root.rowconfigure(0, weight=1)
+root.rowconfigure(1, weight=1)
+root.rowconfigure(2, weight=6)
+root.rowconfigure(3, weight=1)
+root.rowconfigure(4, weight=2)
+
+#decalre golbals
 proj_dir = ""
 replace_dir = ""
 input_files = []
 
 proj_dir_button = Button(root, text="Select Project Directory", command=select_proj_dir)
-proj_dir_button.pack()
+proj_dir_button.grid(column=2, row=0, sticky=tk.E+tk.W, padx=5, pady=5)
 
-proj_dir_label = Label(root, text="")
-proj_dir_label.pack()
+proj_dir_labelframe = LabelFrame(root, bg="white")
+proj_dir_labelframe.grid(column=0, row=0, sticky=tk.N+tk.S+tk.E+tk.W, columnspan=2, padx=5, pady=5)
+proj_dir_label = Label(proj_dir_labelframe, text="", bg="white")
+proj_dir_label.grid(row=0, column=0, sticky=tk.W)
+
+
 
 replace_dir_button = Button(root, text="Select Replace Directory", command=select_replace_dir)
-replace_dir_button.pack()
+replace_dir_button.grid(column=2, row=1, sticky=tk.E+tk.W, padx=5, pady=5)
 
-replace_dir_label = Label(root, text="")
-replace_dir_label.pack()
+replace_dir_labelframe = LabelFrame(root, bg="white")
+replace_dir_labelframe.grid(column=0, row=1, sticky=tk.N+tk.S+tk.E+tk.W, columnspan=2, padx=5, pady=5)
+replace_dir_label = Label(replace_dir_labelframe, text="", bg="white")
+replace_dir_label.grid(row=0, column=0, sticky=tk.W)
 
-scrollable_frame = ScrollableLabelFrame(root, )
-scrollable_frame.pack()
+scrollable_frame = ScrollableLabelFrame(root, bg="white")
+scrollable_frame.grid(column=0, row=2, sticky=tk.N+tk.S+tk.E+tk.W, columnspan=3, padx=5, pady=5)
 
 find_files_button = Button(root, text="Find Files", command=populate_checkboxes)
-find_files_button.pack()
+find_files_button.grid(column=0, row=3, sticky=tk.W+tk.E, padx=5, pady=5)
 
 select_all_button = Button(root, text="Select All", command=select_all)
-select_all_button.pack()
+select_all_button.grid(column=2, row=3, sticky=tk.E+tk.W, padx=5)
 
 replace_files_button = Button(root, text="Replace Files", command=replace_files)
-replace_files_button.pack()
+replace_files_button.grid(column=1, row=3, sticky=tk.W+tk.E, padx=5, pady=5)
 
 status_text = Text(root, height = 5)
-status_text.pack()
+status_text.grid(column=0, row=4, columnspan=3, padx=5, pady=5)
 status_text.insert(tk.END, "Status")
 
 root.mainloop()
