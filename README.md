@@ -4,7 +4,7 @@ Fix mp3 import issues
 
 This program re-encodes mp3 fiels incorectly imported by sadie. 
 
-Ddependencies:
+Dependencies:
 
 ffmpeg must ether be installed or ffmpeg.exe must be placed in the same directory as the script
 
