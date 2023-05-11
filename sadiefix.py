@@ -61,15 +61,9 @@ def run_ffmpeg(input_file, output_file, sample_rate, bit_depth, channel_count):
         raise ValueError(f'Invalid bit depth: {bit_depth}. Valid options are 16, 24, or 32.')
 
     # Construct the command to run ffmpeg
-    command = f'ffmpeg -i "{input_file}" -acodec {audio_codec} -ar {str(sample_rate)} -ac {str(channel_count)} -f wav -y "{output_file}"'
-
-
-
+    command = f'ffmpeg -i "{input_file}" -acodec {audio_codec} -ar {str(sample_rate)} -ac {str(channel_count)} -f wav -y "{output_file}" -loglevel quiet'
     # Run the command
     subprocess.run(command, check=True)
-    print(command)
-    
-
 
 
 def get_input_files(proj_dir, replace_dir): #returns a list of objects that contain the audio info for the file in the sadie project, and the path to the file to replace it with
@@ -94,8 +88,11 @@ def process_files(replace_list): # process all the files in a list of objects, m
     if len(replace_list) > 0:
         for i in replace_list:
             ##
+            replace_file_name, replace_file_ext = os.path.splitext(i.proj_file)
             # do somthing here to rename old file 
-            #print(i.proj_file)
+            os.rename(i.proj_file, replace_file_name + "_old" + replace_file_ext)
+            #i.proj_file =  replace_file_name + "_old" + replace_file_ext
+
             status_text.delete(1.0, tk.END)
             status_text.insert(tk.END, "pcocessing " +  i.proj_file)
             status_text.update_idletasks()
@@ -131,7 +128,9 @@ def populate_checkboxes():
     #check that a directory has been selected
     if proj_dir != '' and replace_dir != '':
         input_files = get_input_files(proj_dir, replace_dir)
-
+        # Clear existing checkboxes
+        for i in scrollable_frame.interior.winfo_children():
+            i.destroy()
         for file in input_files:
             checkbox = Checkbutton(scrollable_frame.interior, text=file.proj_file, variable=file.selected, bg="white")
             checkbox.pack(anchor='w')
@@ -197,7 +196,7 @@ select_all_button.grid(column=2, row=3, sticky=tk.E+tk.W, padx=5)
 replace_files_button = Button(root, text="Replace Files", command=replace_files)
 replace_files_button.grid(column=1, row=3, sticky=tk.W+tk.E, padx=5, pady=5)
 
-status_text = Text(root, height = 5)
+status_text = Text(root, height = 4)
 status_text.grid(column=0, row=4, columnspan=3, padx=5, pady=5)
 status_text.insert(tk.END, "Status")
 
@@ -207,7 +206,6 @@ root.mainloop()
     
     
 #-------todo---------
-#tidy up make gui
+#tidy up gui
 #make it check for length 
-#select all button
 #make chckbox bigger 
