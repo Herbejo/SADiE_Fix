@@ -9,7 +9,6 @@ import soundfile as sf
 import os
 
 
-
 class ScrollableLabelFrame(tk.Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
@@ -46,7 +45,6 @@ def get_wave_file_info(file_path):
         sample_rate = sound_file.samplerate
         bit_depth = sound_file.subtype
         channel_count = sound_file.channels
-
     return sample_rate, bit_depth, channel_count
     
 def run_ffmpeg(input_file, output_file, sample_rate, bit_depth, channel_count):
@@ -77,7 +75,6 @@ def get_input_files(proj_dir, replace_dir): #returns a list of objects that cont
         for replace_file in replace_files:
             replace_file_name, replace_file_ext = os.path.splitext(replace_file)
             if proj_file_name == replace_file_name and proj_file_ext == '.wav' :
-                #print(proj_file_name)
                 sample_rate, bit_depth, channel_count = get_wave_file_info(os.path.join(proj_dir, proj_file))
                 #the .replace makes the file paths readable to ffmpeg
                 input_files.append(ToReplace(os.path.join(proj_dir, proj_file).replace("\\", "/"), sample_rate, bit_depth, channel_count, os.path.join(replace_dir, replace_file).replace("\\", "/")))
@@ -87,11 +84,9 @@ def get_input_files(proj_dir, replace_dir): #returns a list of objects that cont
 def process_files(replace_list): # process all the files in a list of objects, make sure to rename the old file before replaing it 
     if len(replace_list) > 0:
         for i in replace_list:
-            ##
+            #rename the old file
             replace_file_name, replace_file_ext = os.path.splitext(i.proj_file)
-            # do somthing here to rename old file 
             os.rename(i.proj_file, replace_file_name + "_old" + replace_file_ext)
-            #i.proj_file =  replace_file_name + "_old" + replace_file_ext
 
             status_text.delete(1.0, tk.END)
             status_text.insert(tk.END, "pcocessing " +  i.proj_file)
@@ -100,18 +95,15 @@ def process_files(replace_list): # process all the files in a list of objects, m
             status_text.delete(1.0, tk.END)
             status_text.insert(tk.END, "compleated " +  i.proj_file)
             status_text.update_idletasks()
-            #log here
         status_text.delete(1.0, tk.END)
         status_text.insert(tk.END, "processed " +  str(len(replace_list)) + " items")
     else:
         tk.messagebox.showerror(title="Error", message="Please Select Files to Process")    
 
-def make_dpi_aware(): ##this needs to be somewhere to make it look nice
+def make_dpi_aware(): #this needs to be somewhere to make it look nice
     if int(platform.release()) >= 8:
         ctypes.windll.shcore.SetProcessDpiAwareness(2)
-     
 make_dpi_aware()
-
 
 def select_proj_dir():
     global proj_dir
@@ -145,12 +137,10 @@ def replace_files():
     process_files(replace_list)
 
 
-
 #decalre golbals
 proj_dir = ""
 replace_dir = ""
 input_files = []
-
 
 root = Tk()
 root.title("SADiE Fix")
@@ -202,8 +192,6 @@ status_text.insert(tk.END, "Status")
 
 root.mainloop()
 
-    
-    
     
 #-------todo---------
 #tidy up gui
